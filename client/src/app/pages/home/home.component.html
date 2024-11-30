@@ -1,0 +1,63 @@
+<div class="chat-container">
+    <div class="chat-body">
+        <div class="message-container" *ngIf="contents.length === 0">
+            <p class="message" [innerHTML]="messageStart"></p>
+        </div>
+        <div *ngFor="let content of contents"
+            class="chat-message"
+            [ngClass]="content.agent">
+            <div class="message-details">
+                <img *ngIf="content.imagePreview" [src]="content.imagePreview" height="150px" alt="Image Preview" />
+                <p *ngIf="content.loading"
+                    class="message-content"
+                    [ngClass]="{ loading: content.loading }"
+                    [innerHTML]="content.message | lineBreak"
+                ></p>
+                <markdown *ngIf="!content.loading "
+                    class="variable-binding message-content"
+                    [data]="content.message"
+                ></markdown>
+            </div>
+        </div>
+    </div>
+    <div class="chat-actions">
+        <form [formGroup]="customForm">
+            <mat-form-field appearance="fill">
+                <mat-label>Tipo</mat-label>
+                <mat-select formControlName="option" (selectionChange)="changeMethod()">
+                    <mat-option *ngFor="let option of options" [value]="option.value">
+                        {{ option.viewValue }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </form>
+    </div>
+</div>
+
+<div class="chat-footer-container">
+    <mat-form-field class="chat-input">
+        <div class="image-preview" *ngIf="imageFile?.preview && customForm.value.option === 'vision'">
+            <img [src]="imageFile?.preview" width="100px" alt="Image Preview" />
+            <button mat-icon-button matTooltip="Remove" color="warn" (click)="removeFile()">
+              <mat-icon class="custom-icon-size">close</mat-icon>
+            </button>
+        </div>
+
+        <mat-label>Envía un mensaje</mat-label>
+        <textarea
+            matInput
+            #inputMessage
+            [(ngModel)]="message"
+            (keyup.enter)="generateText(message)"></textarea>
+            
+        <button mat-icon-button matSuffix class="image-upload-button"
+            *ngIf="customForm.value.option === 'vision'">
+            <input type="file" accept="image/png, image/jpeg, image/webp" (change)="selectImage($event)" #inputImage/>
+            <mat-icon>add_photo_alternate</mat-icon>
+        </button>
+    </mat-form-field>
+    <button mat-icon-button color="primary" (click)="generateText(message)">
+        <mat-icon>arrow_upward</mat-icon>
+    </button>
+</div>
+  
